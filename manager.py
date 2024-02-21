@@ -26,20 +26,15 @@ def remove_song():
         messagebox.showinfo("Info", "Song not found.")
     update_display()
 
-def find_song_linear():
-    song = simpledialog.askstring("Find Song (Linear)", "Enter song name:")
-    if song in song_list:
-        messagebox.showinfo("Info", f"Song found: {song}")
-    else:
-        messagebox.showinfo("Info", "Song not found.")
 
-def find_song_binary():
-    song = simpledialog.askstring("Find Song (Binary)", "Enter song name:")
-    i = bisect_left(song_list, song)
-    if i != len(song_list) and song_list[i] == song:
-        messagebox.showinfo("Info", f"Song found: {song}")
+def find_song_linear():
+    song_query = simpledialog.askstring("Find Song (Linear)", "Enter part of the song name or artist:")
+    matches = [song for song in song_list if song_query.lower() in song.lower()]
+    if matches:
+        messagebox.showinfo("Info", "Songs found:\n" + "\n".join(matches))
     else:
         messagebox.showinfo("Info", "Song not found.")
+    
 
 def update_display():
     song_display.delete(1.0, tk.END)
@@ -54,7 +49,8 @@ def find_songs_by_artist():
     
     artist_name = artist_name.lower()
     found_songs = [song for song in song_list if artist_name in song.lower().split(' - ')[0]]
-    
+
+
     if found_songs:
         message = "Songs found:\n" + "\n".join(found_songs)
     else:
@@ -67,11 +63,11 @@ root = tk.Tk()
 root.title("Song Manager")
 
 # Styling
-root.configure(bg='light grey')
+root.configure(bg='light pink')
 myFont = font.Font(family='Helvetica', size=12, weight='bold')
 
 # Main frame
-main_frame = tk.Frame(root, bg='light grey', padx=10, pady=10)
+main_frame = tk.Frame(root, bg='light pink', padx=10, pady=10)
 main_frame.pack(padx=10, pady=10)
 
 # Input frame
@@ -83,7 +79,7 @@ song_entry = tk.Entry(input_frame, width=40, font=myFont)
 song_entry.grid(row=0, column=0, padx=5, pady=5)
 
 # Button frame
-button_frame = tk.Frame(main_frame, bg='light grey')
+button_frame = tk.Frame(main_frame, bg='black')
 button_frame.pack(pady=5)
 
 # Operation buttons
@@ -96,8 +92,7 @@ remove_button.grid(row=0, column=1, padx=5, pady=5)
 find_linear_button = tk.Button(button_frame, text="Find Song (Linear)", command=find_song_linear, font=myFont)
 find_linear_button.grid(row=0, column=2, padx=5, pady=5)
 
-find_binary_button = tk.Button(button_frame, text="Find Song (Binary)", command=find_song_binary, font=myFont)
-find_binary_button.grid(row=0, column=3, padx=5, pady=5)
+
 
 find_artist_button = tk.Button(button_frame, text="Find Songs by Artist", command=find_songs_by_artist, font=myFont)
 find_artist_button.grid(row=0, column=4, padx=5, pady=5)  # Adjust grid positioning as necessary
