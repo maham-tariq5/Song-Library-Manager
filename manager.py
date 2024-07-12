@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog, font
+from tkinter import messagebox, simpledialog, font, PhotoImage
 from bisect import bisect_left
 import json
 import os
@@ -50,17 +50,15 @@ def find_song_linear():
         messagebox.showinfo("Info", "Song not found.")
 
 def find_song_binary():
-    song_query = simpledialog.askstring("Find Song (Binary)", "Enter song name or artist:")
-    index = bisect_left(song_list, song_query)
-    if index < len(song_list) and song_list[index].lower().startswith(song_query.lower()):
-        messagebox.showinfo("Info", f"Song found: {song_list[index]}")
+    song_query = simpledialog.askstring("Find Song (Binary)", "Enter song name:")
+    if song_query:
+        index = bisect_left(song_list, song_query)
+        if index < len(song_list) and song_list[index] == song_query:
+            messagebox.showinfo("Info", f"Song found: {song_list[index]}")
+        else:
+            messagebox.showinfo("Info", "Song not found.")
     else:
-        messagebox.showinfo("Info", "Song not found.")
-
-def update_display():
-    song_display.delete(1.0, tk.END)
-    for song in song_list:
-        song_display.insert(tk.END, song + "\n")
+        messagebox.showinfo("Info", "Please enter a song name.")
 
 def find_songs_by_artist():
     artist_name = simpledialog.askstring("Find Songs by Artist", "Enter artist name:")
@@ -78,57 +76,73 @@ def find_songs_by_artist():
     
     messagebox.showinfo("Search Results", message)
 
+def update_display():
+    song_display.delete(1.0, tk.END)
+    for song in song_list:
+        song_display.insert(tk.END, song + "\n")
+
 root = tk.Tk()
 root.title("Song Manager")
 
 # Styling
-root.configure(bg='light pink')
-myFont = font.Font(family='Helvetica', size=12, weight='bold')
+root.configure(bg='#f0c3cc')
+myFont = font.Font(family='Helvetica', size=12)
+
+# Load an icon image for the window (optional)
+# root.iconphoto(False, PhotoImage(file='icon.png'))
 
 # Main frame
-main_frame = tk.Frame(root, bg='light pink', padx=10, pady=10)
+main_frame = tk.Frame(root, bg='#f0c3cc', padx=10, pady=10)
 main_frame.pack(padx=10, pady=10)
 
+# Header image (optional)
+# header_img = PhotoImage(file='header.png')
+# header_label = tk.Label(main_frame, image=header_img, bg='#f0c3cc')
+# header_label.pack(pady=5)
+
 # Input frame
-input_frame = tk.Frame(main_frame, bg='light grey')
+input_frame = tk.Frame(main_frame, bg='#ffffff')
 input_frame.pack(pady=5)
 
 # Entry widget for adding songs
-song_entry = tk.Entry(input_frame, width=40, font=myFont)
+song_entry = tk.Entry(input_frame, width=40, font=myFont, bd=2, relief='solid')
 song_entry.grid(row=0, column=0, padx=5, pady=5)
 
 # Button frame
-button_frame = tk.Frame(main_frame, bg='black')
+button_frame = tk.Frame(main_frame, bg='#000000')
 button_frame.pack(pady=5)
 
-# Operation buttons
-add_button = tk.Button(button_frame, text="Add Song", command=add_song, font=myFont)
+# Operation buttons with rounded corners
+button_style = {"font": myFont, "bg": "#ffffff", "fg": "#000000", "relief": "solid", "bd": 2}
+
+add_button = tk.Button(button_frame, text="Add Song", command=add_song, **button_style)
 add_button.grid(row=0, column=0, padx=5, pady=5)
 
-remove_button = tk.Button(button_frame, text="Remove Song", command=remove_song, font=myFont)
+remove_button = tk.Button(button_frame, text="Remove Song", command=remove_song, **button_style)
 remove_button.grid(row=0, column=1, padx=5, pady=5)
 
-find_linear_button = tk.Button(button_frame, text="Find Song (Linear)", command=find_song_linear, font=myFont)
+find_linear_button = tk.Button(button_frame, text="Find Song (Linear)", command=find_song_linear, **button_style)
 find_linear_button.grid(row=0, column=2, padx=5, pady=5)
 
-find_binary_button = tk.Button(button_frame, text="Find Song (Binary)", command=find_song_binary, font=myFont)
+find_binary_button = tk.Button(button_frame, text="Find Song (Binary)", command=find_song_binary, **button_style)
 find_binary_button.grid(row=0, column=3, padx=5, pady=5)
 
-find_artist_button = tk.Button(button_frame, text="Find Songs by Artist", command=find_songs_by_artist, font=myFont)
+find_artist_button = tk.Button(button_frame, text="Find Songs by Artist", command=find_songs_by_artist, **button_style)
 find_artist_button.grid(row=0, column=4, padx=5, pady=5)
 
 # Display frame
-display_frame = tk.Frame(main_frame, bg='light grey')
+display_frame = tk.Frame(main_frame, bg='#f0c3cc')
 display_frame.pack(pady=5)
 
-# Song display with scrollbar
+# Song display with scroll bar
+song_display = tk.Text(display_frame, height=10, width=50, font=myFont, bg='#000000', bd=2, relief='solid')
+song_display.pack(side=tk.LEFT, padx=5, pady=5)
+
 scrollbar = tk.Scrollbar(display_frame)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-song_display = tk.Text(display_frame, height=10, width=50, font=myFont, yscrollcommand=scrollbar.set)
-song_display.pack(padx=5, pady=5)
-
+song_display.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=song_display.yview)
 
 update_display()
+
 root.mainloop()
