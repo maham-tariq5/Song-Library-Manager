@@ -12,4 +12,6 @@ Find Songs by Artist: Find all songs by a specific artist.
 
 # Running Program
 
+```
 python3 manager.py
+```
