@@ -88,17 +88,12 @@ root.title("Song Manager")
 root.configure(bg='#f0c3cc')
 myFont = font.Font(family='Helvetica', size=12)
 
-# Load an icon image for the window (optional)
-# root.iconphoto(False, PhotoImage(file='icon.png'))
 
 # Main frame
 main_frame = tk.Frame(root, bg='#f0c3cc', padx=10, pady=10)
 main_frame.pack(padx=10, pady=10)
 
-# Header image (optional)
-# header_img = PhotoImage(file='header.png')
-# header_label = tk.Label(main_frame, image=header_img, bg='#f0c3cc')
-# header_label.pack(pady=5)
+
 
 # Input frame
 input_frame = tk.Frame(main_frame, bg='#ffffff')
