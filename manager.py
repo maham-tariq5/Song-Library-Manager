@@ -1,9 +1,22 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog, font
 from bisect import bisect_left
+import json
+import os
 
-# Initialize song list
-song_list = sorted(["Drake - Marvins Room", "Lorde - Green Light","Kanye West - All of the lights", "Taylor Swift - Dress", 'The Weeknd - After Hours', "Nicki Minaj - Pink Friday", "Rihanna - Needed Me", "Frank Ocean - Pink + White", "Drake - Sticky"])
+# File path
+file_path = "song_list.json"
+
+# Load song list from file
+if os.path.exists(file_path):
+    with open(file_path, "r") as file:
+        song_list = sorted(json.load(file))
+else:
+    song_list = sorted([])
+
+def save_song_list():
+    with open(file_path, "w") as file:
+        json.dump(song_list, file)
 
 def add_song():
     song = song_entry.get().strip()
@@ -12,6 +25,7 @@ def add_song():
             song_list.append(song)
             song_list.sort()
             song_entry.delete(0, tk.END)
+            save_song_list()
         else:
             messagebox.showinfo("Info", "Song already exists.")
     else:
@@ -22,10 +36,10 @@ def remove_song():
     song = simpledialog.askstring("Remove Song", "Enter song name:")
     if song in song_list:
         song_list.remove(song)
+        save_song_list()
     else:
         messagebox.showinfo("Info", "Song not found.")
     update_display()
-
 
 def find_song_linear():
     song_query = simpledialog.askstring("Find Song (Linear)", "Enter part of the song name or artist:")
@@ -34,7 +48,14 @@ def find_song_linear():
         messagebox.showinfo("Info", "Songs found:\n" + "\n".join(matches))
     else:
         messagebox.showinfo("Info", "Song not found.")
-    
+
+def find_song_binary():
+    song_query = simpledialog.askstring("Find Song (Binary)", "Enter song name or artist:")
+    index = bisect_left(song_list, song_query)
+    if index < len(song_list) and song_list[index].lower().startswith(song_query.lower()):
+        messagebox.showinfo("Info", f"Song found: {song_list[index]}")
+    else:
+        messagebox.showinfo("Info", "Song not found.")
 
 def update_display():
     song_display.delete(1.0, tk.END)
@@ -50,14 +71,12 @@ def find_songs_by_artist():
     artist_name = artist_name.lower()
     found_songs = [song for song in song_list if artist_name in song.lower().split(' - ')[0]]
 
-
     if found_songs:
         message = "Songs found:\n" + "\n".join(found_songs)
     else:
         message = "No songs found by that artist."
     
     messagebox.showinfo("Search Results", message)
-
 
 root = tk.Tk()
 root.title("Song Manager")
@@ -92,20 +111,24 @@ remove_button.grid(row=0, column=1, padx=5, pady=5)
 find_linear_button = tk.Button(button_frame, text="Find Song (Linear)", command=find_song_linear, font=myFont)
 find_linear_button.grid(row=0, column=2, padx=5, pady=5)
 
-
+find_binary_button = tk.Button(button_frame, text="Find Song (Binary)", command=find_song_binary, font=myFont)
+find_binary_button.grid(row=0, column=3, padx=5, pady=5)
 
 find_artist_button = tk.Button(button_frame, text="Find Songs by Artist", command=find_songs_by_artist, font=myFont)
-find_artist_button.grid(row=0, column=4, padx=5, pady=5)  # Adjust grid positioning as necessary
-
+find_artist_button.grid(row=0, column=4, padx=5, pady=5)
 
 # Display frame
 display_frame = tk.Frame(main_frame, bg='light grey')
 display_frame.pack(pady=5)
 
-# Song display
-song_display = tk.Text(display_frame, height=10, width=50, font=myFont)
+# Song display with scrollbar
+scrollbar = tk.Scrollbar(display_frame)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+song_display = tk.Text(display_frame, height=10, width=50, font=myFont, yscrollcommand=scrollbar.set)
 song_display.pack(padx=5, pady=5)
 
-update_display()
+scrollbar.config(command=song_display.yview)
 
+update_display()
 root.mainloop()
